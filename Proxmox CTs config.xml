@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2026-01-19 20:23:43">
+<sys_remote_update_set action="INSERT_OR_UPDATE">
+<application display_value="Global">global</application>
+<application_name>Global</application_name>
+<application_scope>global</application_scope>
+<application_version/>
+<collisions/>
+<commit_date/>
+<deleted/>
+<description/>
+<inserted/>
+<name>Proxmox CTs config</name>
+<origin_sys_id/>
+<parent display_value=""/>
+<release_date/>
+<remote_base_update_set display_value=""/>
+<remote_parent_id/>
+<remote_sys_id>0243492dc3eaba90982a7d0ed4013111</remote_sys_id>
+<state>loaded</state>
+<summary/>
+<sys_class_name>sys_remote_update_set</sys_class_name>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 20:23:42</sys_created_on>
+<sys_id>4973456dc3eaba90982a7d0ed4013109</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 20:23:42</sys_updated_on>
+<update_set display_value=""/>
+<update_source display_value=""/>
+<updated/>
+</sys_remote_update_set>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>ecc_agent_script_file_eedb5802c30a7610982a7d0ed4013102</name>
+<payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="ecc_agent_script_file"><ecc_agent_script_file action="INSERT_OR_UPDATE"><active>true</active><checksum/><description>Get JSON with Proxmox LXC containers' config</description><directory>false</directory><name>Proxmox_CTs_config.sh</name><parent display_value="SSHScriptFiles">48deb961ff123100ab8fffffffffff07</parent><script>#!/bin/bash&#13;
+&#13;
+# 1. Get name of local node&#13;
+local_node=$(sudo pvesh get /cluster/status --output-format json \&#13;
+  | tr ',' '\n' \&#13;
+  | grep -A 3 '"local":1' \&#13;
+  | grep '"name"' \&#13;
+  | head -n1 \&#13;
+  | sed -E 's/.*"name":"([^"]+)".*/\1/')&#13;
+&#13;
+# 2. Get list of CTs from local node&#13;
+vmids=$(sudo pvesh get /nodes/"$local_node"/lxc/ --output-format json \&#13;
+  | tr ',' '\n' \&#13;
+  | grep '"vmid"' \&#13;
+  | sed -E 's/.*"vmid":([0-9]+).*/\1/')&#13;
+&#13;
+# 3. Get configs and create JSON array&#13;
+echo "["&#13;
+&#13;
+first=1&#13;
+for vmid in $vmids; do&#13;
+    cfg=$(sudo pvesh get /nodes/"$local_node"/lxc/"$vmid"/config --output-format json)&#13;
+&#13;
+    if [ $first -eq 1 ]; then&#13;
+        first=0&#13;
+    else&#13;
+        echo ","&#13;
+    fi&#13;
+&#13;
+    echo "$cfg"&#13;
+done&#13;
+&#13;
+echo "]"&#13;
+</script><script_attachment/><source/><sys_class_name>ecc_agent_script_file</sys_class_name><sys_created_by>karel.benes</sys_created_by><sys_created_on>2025-12-27 10:16:30</sys_created_on><sys_domain>global</sys_domain><sys_domain_path>/</sys_domain_path><sys_id>eedb5802c30a7610982a7d0ed4013102</sys_id><sys_mod_count>5</sys_mod_count><sys_name>Proxmox_CTs_config.sh</sys_name><sys_overrides/><sys_package display_value="Global" source="global">global</sys_package><sys_policy/><sys_scope display_value="Global">global</sys_scope><sys_update_name>ecc_agent_script_file_eedb5802c30a7610982a7d0ed4013102</sys_update_name><sys_updated_by>karel.benes</sys_updated_by><sys_updated_on>2026-01-19 20:23:21</sys_updated_on><use_attachment>false</use_attachment><version/></ecc_agent_script_file></record_update>]]></payload>
+<payload_hash>-1129571003</payload_hash>
+<remote_update_set display_value="Proxmox CTs config">4973456dc3eaba90982a7d0ed4013109</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 20:23:42</sys_created_on>
+<sys_id>8d73456dc3eaba90982a7d0ed4013109</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_recorded_at>19bd7ed26dc0000001</sys_recorded_at>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 20:23:42</sys_updated_on>
+<table/>
+<target_name>Proxmox_CTs_config.sh</target_name>
+<type>MID Server Script File</type>
+<update_domain>global</update_domain>
+<update_guid>c463016d2deaba90745122e471fd2d9e</update_guid>
+<update_guid_history>c463016d2deaba90745122e471fd2d9e:-1129571003,a2534d2d71eaba90d2232d626af0efdf:343469029,2c6a2296e6c27a1062e02bbda68c29a9:-1129571003,95b42aca5f0eb610330088ab2439dd71:641580269,8b8099822f42b610d0b9a556fb47104a:-755093146,c6eb508e880a76101d79f0ec7b500e64:2080285868</update_guid_history>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+</unload>

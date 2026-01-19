@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2026-01-19 20:30:14">
+<sys_remote_update_set action="INSERT_OR_UPDATE">
+<application display_value="Global">global</application>
+<application_name>Global</application_name>
+<application_scope>global</application_scope>
+<application_version/>
+<collisions/>
+<commit_date/>
+<deleted/>
+<description/>
+<inserted/>
+<name>Get Object Id for QEMU Linux Server</name>
+<origin_sys_id/>
+<parent display_value=""/>
+<release_date/>
+<remote_base_update_set display_value=""/>
+<remote_parent_id/>
+<remote_sys_id>3e744d21c32eba90982a7d0ed4013126</remote_sys_id>
+<state>loaded</state>
+<summary/>
+<sys_class_name>sys_remote_update_set</sys_class_name>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 20:30:14</sys_created_on>
+<sys_id>a4f409a1c32eba90982a7d0ed4013112</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 20:30:14</sys_updated_on>
+<update_set display_value=""/>
+<update_source display_value=""/>
+<updated/>
+</sys_remote_update_set>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>sa_pattern_a18b38fbc3f9fa50982a7d0ed40131a9</name>
+<payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sa_pattern"><sa_pattern action="INSERT_OR_UPDATE"><active>true</active><ci_type>cmdb_ci_appl_generic</ci_type><cpattern_type>2</cpattern_type><description/><directory>false</directory><enforce_proc_classy>false</enforce_proc_classy><invoke_per_account>false</invoke_per_account><metadata_id>a18b38fbc3f9fa50982a7d0ed40131a9</metadata_id><name>Get Object Id for QEMU Linux Server</name><ndl>library {&#13;
+	name = "Get Object Id for QEMU Linux Server"&#13;
+	id = "a18b38fbc3f9fa50982a7d0ed40131a9"&#13;
+	description = "Get Object Id for QEMU Linux Server"&#13;
+	step {&#13;
+		name = "Set object_id"&#13;
+		if {&#13;
+			condition = contains {&#13;
+				get_attr {"serial_uuid[*].manufacturer"}&#13;
+				"QEMU"&#13;
+			}&#13;
+			on_true = transform {&#13;
+				src_table_name = "cmdb_ci_linux_server"&#13;
+				target_table_name = "cmdb_ci_linux_server"&#13;
+				operation {&#13;
+					set_field {&#13;
+						field_name = "object_id"&#13;
+						value = get_attr {"serial_uuid[*].uuid_serial"}&#13;
+					}&#13;
+					set_field {&#13;
+						field_name = "virtual"&#13;
+						value = "true"&#13;
+					}&#13;
+				}&#13;
+			}&#13;
+			on_false = nop {}&#13;
+		}&#13;
+	}&#13;
+}&#13;
+</ndl><parent/><serverless>false</serverless><source/><sys_class_name>sa_pattern</sys_class_name><sys_created_by>karel.benes</sys_created_by><sys_created_on>2025-12-20 12:48:18</sys_created_on><sys_domain>global</sys_domain><sys_domain_path>/</sys_domain_path><sys_id>a18b38fbc3f9fa50982a7d0ed40131a9</sys_id><sys_mod_count>11</sys_mod_count><sys_name>Get Object Id for QEMU Linux Server</sys_name><sys_overrides/><sys_package display_value="Global" source="global">global</sys_package><sys_policy/><sys_replace/><sys_scope display_value="Global">global</sys_scope><sys_update_name>sa_pattern_a18b38fbc3f9fa50982a7d0ed40131a9</sys_update_name><sys_updated_by>karel.benes</sys_updated_by><sys_updated_on>2026-01-19 20:29:36</sys_updated_on><version/></sa_pattern></record_update>]]></payload>
+<payload_hash>1479891562</payload_hash>
+<remote_update_set display_value="Get Object Id for QEMU Linux Server">a4f409a1c32eba90982a7d0ed4013112</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 20:30:14</sys_created_on>
+<sys_id>e8f409a1c32eba90982a7d0ed4013112</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_recorded_at>19bd7f2dd410000001</sys_recorded_at>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 20:30:14</sys_updated_on>
+<table/>
+<target_name>Get Object Id for QEMU Linux Server</target_name>
+<type>Discovery Patterns</type>
+<update_domain>global</update_domain>
+<update_guid>6fc401a13b2eba90a69cd59418c61c09</update_guid>
+<update_guid_history>6fc401a13b2eba90a69cd59418c61c09:1479891562,95c40d61e42eba901efdd59313ae2bb5:293514532,ddb9ea167ac27a109962ce67ccc21b71:1479891562,b645665a30827a106f3623c13ebbfeea:-1504309351,8435665a5a827a106fd7df5fd7522ce3:-1542459169,d443ee163a827a1067e4f624ad468c19:-76566556,6813e616cd827a103dada1b531b220b6:1064747286,71159633d5b93e50fc19f6ab99e2dea0:-1712589729,c5cf42bf7f393e502400970f400139d2:-1618105235,d02c023f1ff53e509fd8697f0fad0fd5:-1135263971,b5e081f7303dfa50592b271ede2cde95:1767486446,618b38fb8cf9fa506f6b75e2ba866cae:239516979</update_guid_history>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+</unload>

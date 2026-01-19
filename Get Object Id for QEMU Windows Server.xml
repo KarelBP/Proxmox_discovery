@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2026-01-19 20:46:15">
+<sys_remote_update_set action="INSERT_OR_UPDATE">
+<application display_value="Global">global</application>
+<application_name>Global</application_name>
+<application_scope>global</application_scope>
+<application_version/>
+<collisions/>
+<commit_date/>
+<deleted/>
+<description/>
+<inserted/>
+<name>Get Object Id for QEMU Windows Server</name>
+<origin_sys_id/>
+<parent display_value=""/>
+<release_date/>
+<remote_base_update_set display_value=""/>
+<remote_parent_id/>
+<remote_sys_id>3018092dc32eba90982a7d0ed4013134</remote_sys_id>
+<state>loaded</state>
+<summary/>
+<sys_class_name>sys_remote_update_set</sys_class_name>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 20:46:15</sys_created_on>
+<sys_id>5f9809adc32eba90982a7d0ed4013193</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 20:46:15</sys_updated_on>
+<update_set display_value=""/>
+<update_source display_value=""/>
+<updated/>
+</sys_remote_update_set>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>sa_pattern_01fbda33c3f93e50982a7d0ed401310f</name>
+<payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sa_pattern"><sa_pattern action="INSERT_OR_UPDATE"><active>true</active><ci_type>cmdb_ci_appl_generic</ci_type><cpattern_type>2</cpattern_type><description/><directory>false</directory><enforce_proc_classy>false</enforce_proc_classy><invoke_per_account>false</invoke_per_account><metadata_id>01fbda33c3f93e50982a7d0ed401310f</metadata_id><name>Get Object Id for QEMU Windows Server</name><ndl>library {&#13;
+	name = "Get Object Id for QEMU Windows Server"&#13;
+	id = "01fbda33c3f93e50982a7d0ed401310f"&#13;
+	description = "Get Object Id for QEMU Windows Server"&#13;
+	step {&#13;
+		name = "Set object_id"&#13;
+		if {&#13;
+			condition = contains {&#13;
+				get_attr {"Win32_ComputerSystem[*].Manufacturer"}&#13;
+				"QEMU"&#13;
+			}&#13;
+			on_true = transform {&#13;
+				src_table_name = "cmdb_ci_win_server"&#13;
+				target_table_name = "cmdb_ci_win_server"&#13;
+				operation {&#13;
+					set_field {&#13;
+						field_name = "object_id"&#13;
+						value = get_attr {"Win32_ComputerSystemProduct[*].UUID"}&#13;
+					}&#13;
+					set_field {&#13;
+						field_name = "virtual"&#13;
+						value = "true"&#13;
+					}&#13;
+				}&#13;
+			}&#13;
+			on_false = nop {}&#13;
+		}&#13;
+	}&#13;
+}&#13;
+</ndl><parent/><serverless>false</serverless><source/><sys_class_name>sa_pattern</sys_class_name><sys_created_by>karel.benes</sys_created_by><sys_created_on>2025-12-20 19:49:37</sys_created_on><sys_domain>global</sys_domain><sys_domain_path>/</sys_domain_path><sys_id>01fbda33c3f93e50982a7d0ed401310f</sys_id><sys_mod_count>6</sys_mod_count><sys_name>Get Object Id for QEMU Windows Server</sys_name><sys_overrides/><sys_package display_value="Global" source="global">global</sys_package><sys_policy/><sys_replace/><sys_scope display_value="Global">global</sys_scope><sys_update_name>sa_pattern_01fbda33c3f93e50982a7d0ed401310f</sys_update_name><sys_updated_by>karel.benes</sys_updated_by><sys_updated_on>2026-01-19 20:45:42</sys_updated_on><version/></sa_pattern></record_update>]]></payload>
+<payload_hash>1702976606</payload_hash>
+<remote_update_set display_value="Get Object Id for QEMU Windows Server">5f9809adc32eba90982a7d0ed4013193</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 20:46:15</sys_created_on>
+<sys_id>939809adc32eba90982a7d0ed4013194</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_recorded_at>19bd80199950000001</sys_recorded_at>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 20:46:15</sys_updated_on>
+<table/>
+<target_name>Get Object Id for QEMU Windows Server</target_name>
+<type>Discovery Patterns</type>
+<update_domain>global</update_domain>
+<update_guid>937805a1702eba901be11a6eca05e788</update_guid>
+<update_guid_history>937805a1702eba901be11a6eca05e788:1702976606,0178cd6d802eba9030d46ba34a8fbe6b:-1544051478,5077a6de96827a10ef9ffced54bcfb08:1702976606,5ce4e2966ece3a10c84abbd896c7fab8:2142030019,00c4661ad8827a10b0e47203ddca873a:-1759382399,d2e262b7f03d3e5042bb4bea6b684bd3:371537515,01fbda3328f93e50b19204d63fbf2c14:489485935</update_guid_history>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+</unload>

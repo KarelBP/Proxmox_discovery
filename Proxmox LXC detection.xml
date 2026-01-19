@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2026-01-19 20:51:19">
+<sys_remote_update_set action="INSERT_OR_UPDATE">
+<application display_value="Global">global</application>
+<application_name>Global</application_name>
+<application_scope>global</application_scope>
+<application_version/>
+<collisions/>
+<commit_date/>
+<deleted/>
+<description/>
+<inserted/>
+<name>Proxmox LXC detection</name>
+<origin_sys_id/>
+<parent display_value=""/>
+<release_date/>
+<remote_base_update_set display_value=""/>
+<remote_parent_id/>
+<remote_sys_id>d4498521c36eba90982a7d0ed401315e</remote_sys_id>
+<state>loaded</state>
+<summary/>
+<sys_class_name>sys_remote_update_set</sys_class_name>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 20:51:19</sys_created_on>
+<sys_id>29c9c5a1c36eba90982a7d0ed40131a2</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 20:51:19</sys_updated_on>
+<update_set display_value=""/>
+<update_source display_value=""/>
+<updated/>
+</sys_remote_update_set>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>sa_pattern_0a4cee46c34ab610982a7d0ed40131ea</name>
+<payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sa_pattern"><sa_pattern action="INSERT_OR_UPDATE"><active>true</active><ci_type>cmdb_ci_appl_generic</ci_type><cpattern_type>2</cpattern_type><description/><directory>false</directory><enforce_proc_classy>false</enforce_proc_classy><invoke_per_account>false</invoke_per_account><metadata_id>0a4cee46c34ab610982a7d0ed40131ea</metadata_id><name>Proxmox LXC detection</name><ndl>library {&#13;
+	name = "Proxmox LXC detection"&#13;
+	id = "0a4cee46c34ab610982a7d0ed40131ea"&#13;
+	description = "Proxmox LXC detection"&#13;
+	step {&#13;
+		name = "Detect if we're running in a container"&#13;
+		runcmd_to_var {&#13;
+			cmd = "[ -e /dev/.lxc-boot-id ] &amp;&amp; echo 'lxc'"&#13;
+			execution_mode = "DEFAULT"&#13;
+			var_names = "container_type"&#13;
+			parsing_strategy = delimited_parsing {&#13;
+				selected_positions = 1&#13;
+			}&#13;
+			if_not_found_do = terminate {}&#13;
+			cache_flag = 0&#13;
+		}&#13;
+	}&#13;
+	step {&#13;
+		name = "Set manufacturer and model"&#13;
+		transform {&#13;
+			src_table_name = "cmdb_ci_linux_server"&#13;
+			target_table_name = "cmdb_ci_linux_server"&#13;
+			operation {&#13;
+				set_field {&#13;
+					field_name = "manufacturer"&#13;
+					value = "LXC"&#13;
+				}&#13;
+				set_field {&#13;
+					field_name = "model_id"&#13;
+					value = concat {&#13;
+						"Containerized "&#13;
+						get_attr {"cmdb_ci_linux_server[1].os"}&#13;
+					}&#13;
+				}&#13;
+				set_field {&#13;
+					field_name = "virtual"&#13;
+					value = "true"&#13;
+				}&#13;
+			}&#13;
+		}&#13;
+	}&#13;
+	step {&#13;
+		name = "Get /etc/appliance.info"&#13;
+		comment = "If we get the desired answer, it will be a multi-line text. We don't want to parse it, test for value will be in next step."&#13;
+		runcmd_to_var {&#13;
+			cmd = "[ -e /etc/appliance.info ] &amp;&amp; cat /etc/appliance.info || echo 'Not found'"&#13;
+			execution_mode = "DEFAULT"&#13;
+			var_names = "SystemVariable"&#13;
+			parsing_strategy = empty_strategy {}&#13;
+			if_not_found_do = nop {}&#13;
+			cache_flag = 0&#13;
+		}&#13;
+	}&#13;
+	step {&#13;
+		name = "Set comments"&#13;
+		if {&#13;
+			condition = not_contains {&#13;
+				get_attr {"SystemVariable"}&#13;
+				"Not found"&#13;
+			}&#13;
+			on_true = set_attr {&#13;
+				"cmdb_ci_linux_server[*].comments"&#13;
+				get_attr {"SystemVariable"}&#13;
+			}&#13;
+			on_false = nop {}&#13;
+		}&#13;
+	}&#13;
+}&#13;
+</ndl><parent/><serverless>false</serverless><source/><sys_class_name>sa_pattern</sys_class_name><sys_created_by>karel.benes</sys_created_by><sys_created_on>2025-12-27 20:47:16</sys_created_on><sys_domain>global</sys_domain><sys_domain_path>/</sys_domain_path><sys_id>0a4cee46c34ab610982a7d0ed40131ea</sys_id><sys_mod_count>20</sys_mod_count><sys_name>Proxmox LXC detection</sys_name><sys_overrides/><sys_package display_value="Global" source="global">global</sys_package><sys_policy/><sys_replace/><sys_scope display_value="Global">global</sys_scope><sys_update_name>sa_pattern_0a4cee46c34ab610982a7d0ed40131ea</sys_update_name><sys_updated_by>karel.benes</sys_updated_by><sys_updated_on>2026-01-19 20:50:20</sys_updated_on><version/></sa_pattern></record_update>]]></payload>
+<payload_hash>1421133302</payload_hash>
+<remote_update_set display_value="Proxmox LXC detection">29c9c5a1c36eba90982a7d0ed40131a2</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 20:51:19</sys_created_on>
+<sys_id>6dc9c5a1c36eba90982a7d0ed40131a2</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_recorded_at>19bd805d81c0000001</sys_recorded_at>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 20:51:19</sys_updated_on>
+<table/>
+<target_name>Proxmox LXC detection</target_name>
+<type>Discovery Patterns</type>
+<update_domain>global</update_domain>
+<update_guid>c789c961cf6eba9064b628ee896de315</update_guid>
+<update_guid_history>c789c961cf6eba9064b628ee896de315:1421133302,3f790161506eba907dd7ace5bef8476a:1361327940,d431db1a3a8a7a10a6e84800cdc4f4e1:1421133302,19f0d71a4b8a7a1099469fc5188472d7:-601352380,123e47da2f4a7a10e93f28dbd4476e98:-1165060327,815ac392594a7a10d7467f0851898b4c:-601352380,27f78b12b70a7a1022e4e57def8fb5d8:1246550436,1abd365a7b867a10e74710cb975c62d0:-1003999754,46a5b2d621467a10f2eed298963aebca:1781428714,09a2b65a8f067a10e6ee4d59c0dbd419:269113860,0b82fe1ad8067a1097772b8cecd8b763:151635279,e3d92256c1c27a105f0230f9c2a30a91:464573973,22b3da5268027a105fc3aa84f0292462:-1873146397,16d60a169f8e3a10193320bec3165f0a:581996165,9fc54292798e3a100d1f696419332000:-1750895945,fb34825ade0e3a104e5b6e7423854cac:-1354774445,d934869e684e3a1059a4961fbe0df236:-1734286958,bedd7d5a3a0e3a1076d303c4977917bc:-1642999346,62a7b282ab02f6101d9ba0097d96e7c9:-453320396,8852f6860dceb61067cd9f99a3e70a9c:-2075247745,4a4ca60ea54eb610ae41ecacf05afea5:-2094760903</update_guid_history>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+</unload>

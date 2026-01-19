@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2026-01-19 19:57:02">
+<sys_remote_update_set action="INSERT_OR_UPDATE">
+<application display_value="Global">global</application>
+<application_name>Global</application_name>
+<application_scope>global</application_scope>
+<application_version/>
+<collisions/>
+<commit_date/>
+<deleted/>
+<description/>
+<inserted/>
+<name>Create references between Proxmox and Linux (LXC)</name>
+<origin_sys_id/>
+<parent display_value=""/>
+<release_date/>
+<remote_base_update_set display_value=""/>
+<remote_parent_id/>
+<remote_sys_id>0f1db8e5c3aaba90982a7d0ed401310b</remote_sys_id>
+<state>loaded</state>
+<summary/>
+<sys_class_name>sys_remote_update_set</sys_class_name>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 19:57:01</sys_created_on>
+<sys_id>5a5d3cedc3223a90982a7d0ed40131b1</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 19:57:01</sys_updated_on>
+<update_set display_value=""/>
+<update_source display_value=""/>
+<updated/>
+</sys_remote_update_set>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>sa_pattern_prepost_script_d73fda22c3c6fa10982a7d0ed4013184</name>
+<payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update sys_domain="global" table="sa_pattern_prepost_script"&gt;&lt;sa_pattern_prepost_script action="INSERT_OR_UPDATE"&gt;&lt;active&gt;true&lt;/active&gt;&lt;execution_type&gt;1&lt;/execution_type&gt;&lt;name&gt;Create references between Proxmox and Linux (LXC)&lt;/name&gt;&lt;order&gt;100&lt;/order&gt;&lt;pattern&gt;1d2810b14fa12200609b92918110c7a7&lt;/pattern&gt;&lt;script&gt;&lt;![CDATA[/*
+ * Pre sensor: You can change payload before it will be processed by Identification Engine.
+ * Input parameters: payload, patternId
+ */
+
+var rtrn = {};
+
+// Parse the JSON string into an object
+var payloadObj = JSON.parse(payload);
+
+// Clear payload string to save memory
+payload = null;
+
+// Business logic
+var replaceReferenceFieldValuesWithSysIds = function () {
+    if (!payloadObj.hasOwnProperty('items')) {
+        return;
+    }
+
+    var payloadItems = payloadObj.items;
+
+    for (var i = 0; i &lt; payloadItems.length; i++) {
+
+        if (payloadItems[i].className.includes('cmdb_ci_oslv_engine')) {
+
+            // var linux_host = payloadItems[i].values.name;
+			var name = payloadItems[i].values.name;
+            var linux_host = name.includes('@') ? name.split('@')[1] : name;
+            var ip_address = payloadItems[i].values.ip_address;
+            var running_process = payloadItems[i].values.running_process;
+
+            // --- Linux server ---
+            var linuxSysId = '';
+
+            var linuxGr = new GlideRecord('cmdb_ci_linux_server');
+            linuxGr.addQuery('name', linux_host);
+            linuxGr.addQuery('ip_address', ip_address);            
+            linuxGr.setLimit(1);
+            linuxGr.query();
+
+            if (linuxGr.next()) {
+                linuxSysId = linuxGr.getUniqueValue();
+            }
+
+            // payloadItems[i].values.linux_host = linuxSysId;
+
+            // --- Running process ---
+            var processSysId = '';
+
+            var procGr = new GlideRecord('cmdb_running_process');
+            procGr.addQuery('name', running_process);
+            procGr.addQuery('computer', linuxSysId);
+            procGr.setLimit(1);
+            procGr.query();
+
+            if (procGr.next()) {
+                processSysId = procGr.getUniqueValue();
+            }
+
+            payloadItems[i].values.running_process = processSysId;
+        }
+    }
+};
+
+replaceReferenceFieldValuesWithSysIds();
+
+// Return modified payload
+rtrn = {
+    status: {
+        message: 'Create references between Proxmox and Linux (LXC) Pre-Sensor finished successfuly',
+        isSuccess: true
+    },
+    patternId: patternId,
+    payload: JSON.stringify(payloadObj)
+};]]&gt;&lt;/script&gt;&lt;sys_class_name&gt;sa_pattern_prepost_script&lt;/sys_class_name&gt;&lt;sys_created_by&gt;karel.benes&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2025-12-29 09:07:15&lt;/sys_created_on&gt;&lt;sys_domain&gt;global&lt;/sys_domain&gt;&lt;sys_id&gt;d73fda22c3c6fa10982a7d0ed4013184&lt;/sys_id&gt;&lt;sys_mod_count&gt;4&lt;/sys_mod_count&gt;&lt;sys_name&gt;Create references between Proxmox and Linux (LXC)&lt;/sys_name&gt;&lt;sys_overrides/&gt;&lt;sys_package display_value="Global" source="global"&gt;global&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_scope display_value="Global"&gt;global&lt;/sys_scope&gt;&lt;sys_update_name&gt;sa_pattern_prepost_script_d73fda22c3c6fa10982a7d0ed4013184&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;karel.benes&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2026-01-19 19:56:38&lt;/sys_updated_on&gt;&lt;use_split_payload&gt;true&lt;/use_split_payload&gt;&lt;when_to_exec&gt;1&lt;/when_to_exec&gt;&lt;/sa_pattern_prepost_script&gt;&lt;sys_es_latest_script action="INSERT_OR_UPDATE"&gt;&lt;id&gt;d73fda22c3c6fa10982a7d0ed4013184&lt;/id&gt;&lt;sys_created_by&gt;karel.benes&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2025-12-29 09:07:15&lt;/sys_created_on&gt;&lt;sys_id&gt;5f3fda22c3c6fa10982a7d0ed4013188&lt;/sys_id&gt;&lt;sys_mod_count&gt;0&lt;/sys_mod_count&gt;&lt;sys_updated_by&gt;karel.benes&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2025-12-29 09:07:15&lt;/sys_updated_on&gt;&lt;table&gt;sa_pattern_prepost_script&lt;/table&gt;&lt;use_es_latest&gt;true&lt;/use_es_latest&gt;&lt;/sys_es_latest_script&gt;&lt;/record_update&gt;</payload>
+<payload_hash>-67989594</payload_hash>
+<remote_update_set display_value="Create references between Proxmox and Linux (LXC)">5a5d3cedc3223a90982a7d0ed40131b1</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 19:57:01</sys_created_on>
+<sys_id>9e5d3cedc3223a90982a7d0ed40131b1</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_recorded_at>19bd7d4ae040000001</sys_recorded_at>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 19:57:01</sys_updated_on>
+<table/>
+<target_name>Create references between Proxmox and Linux (LXC)</target_name>
+<type>Pattern Pre/Post Script</type>
+<update_domain>global</update_domain>
+<update_guid>644db0298eaaba90f798b2d3d018513a</update_guid>
+<update_guid_history>644db0298eaaba90f798b2d3d018513a:-67989594,f22d7ce507aaba90770437215a6765f1:1630097228,0cd6e22a76c6fa10d924d63989f3d23c:-67989594,aa20eaa289c6fa10aab859d2b3d4dea2:-1695151543,df3fda22c2c6fa1032170ee4ad077a86:513312386</update_guid_history>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+</unload>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2026-01-19 19:51:33">
+<sys_remote_update_set action="INSERT_OR_UPDATE">
+<application display_value="Global">global</application>
+<application_name>Global</application_name>
+<application_scope>global</application_scope>
+<application_version/>
+<collisions/>
+<commit_date/>
+<deleted/>
+<description/>
+<inserted/>
+<name>Create references between Proxmox and Linux (KVM)</name>
+<origin_sys_id/>
+<parent display_value=""/>
+<release_date/>
+<remote_base_update_set display_value=""/>
+<remote_parent_id/>
+<remote_sys_id>7b6bb0a1c3aaba90982a7d0ed401314d</remote_sys_id>
+<state>loaded</state>
+<summary/>
+<sys_class_name>sys_remote_update_set</sys_class_name>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 19:51:32</sys_created_on>
+<sys_id>7d1c7425c3aaba90982a7d0ed4013129</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 19:51:32</sys_updated_on>
+<update_set display_value=""/>
+<update_source display_value=""/>
+<updated/>
+</sys_remote_update_set>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>sa_pattern_prepost_script_7e98be65c37d3a10982a7d0ed40131cb</name>
+<payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update sys_domain="global" table="sa_pattern_prepost_script"&gt;&lt;sa_pattern_prepost_script action="INSERT_OR_UPDATE"&gt;&lt;active&gt;true&lt;/active&gt;&lt;execution_type&gt;1&lt;/execution_type&gt;&lt;name&gt;Create references between Proxmox and Linux (KVM)&lt;/name&gt;&lt;order&gt;100&lt;/order&gt;&lt;pattern&gt;1d2810b14fa12200609b92918110c7a7&lt;/pattern&gt;&lt;script&gt;&lt;![CDATA[/*
+ * Pre sensor: You can change payload before it will be processed by Identification Engine.
+ * Input parameters: payload, patternId
+ */
+
+var rtrn = {};
+
+// Parse the JSON string into an object
+var payloadObj = JSON.parse(payload);
+
+// Clear payload string to save memory
+payload = null;
+
+// Business logic
+var replaceReferenceFieldValuesWithSysIds = function () {
+    if (!payloadObj.hasOwnProperty('items')) {
+        return;
+    }
+
+    var payloadItems = payloadObj.items;
+
+    for (var i = 0; i &lt; payloadItems.length; i++) {
+
+        if (payloadItems[i].className.includes('cmdb_ci_kvm')) {
+
+            var linux_host = payloadItems[i].values.linux_host;
+            var ip_address = payloadItems[i].values.ip_address;
+            var running_process = payloadItems[i].values.running_process;
+
+            // --- Linux server ---
+            var linuxSysId = '';
+
+            var linuxGr = new GlideRecord('cmdb_ci_linux_server');
+            linuxGr.addQuery('name', linux_host);
+            linuxGr.addQuery('ip_address', ip_address);            
+            linuxGr.setLimit(1);
+            linuxGr.query();
+
+            if (linuxGr.next()) {
+                linuxSysId = linuxGr.getUniqueValue();
+            }
+
+            payloadItems[i].values.linux_host = linuxSysId;
+
+            // --- Running process ---
+            var processSysId = '';
+
+            var procGr = new GlideRecord('cmdb_running_process');
+            procGr.addQuery('name', running_process);
+            procGr.addQuery('computer', linuxSysId);
+            procGr.setLimit(1);
+            procGr.query();
+
+            if (procGr.next()) {
+                processSysId = procGr.getUniqueValue();
+            }
+
+            payloadItems[i].values.running_process = processSysId;
+        }
+    }
+};
+
+replaceReferenceFieldValuesWithSysIds();
+
+// Return modified payload
+rtrn = {
+    status: {
+        message: 'Create references between Proxmox and Linux Pre-Sensor finished successfuly',
+        isSuccess: true
+    },
+    patternId: patternId,
+    payload: JSON.stringify(payloadObj)
+};]]&gt;&lt;/script&gt;&lt;sys_class_name&gt;sa_pattern_prepost_script&lt;/sys_class_name&gt;&lt;sys_created_by&gt;karel.benes&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2025-12-13 22:12:17&lt;/sys_created_on&gt;&lt;sys_domain&gt;global&lt;/sys_domain&gt;&lt;sys_id&gt;7e98be65c37d3a10982a7d0ed40131cb&lt;/sys_id&gt;&lt;sys_mod_count&gt;8&lt;/sys_mod_count&gt;&lt;sys_name&gt;Create references between Proxmox and Linux (KVM)&lt;/sys_name&gt;&lt;sys_overrides/&gt;&lt;sys_package display_value="Global" source="global"&gt;global&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_scope display_value="Global"&gt;global&lt;/sys_scope&gt;&lt;sys_update_name&gt;sa_pattern_prepost_script_7e98be65c37d3a10982a7d0ed40131cb&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;karel.benes&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2026-01-19 19:50:43&lt;/sys_updated_on&gt;&lt;use_split_payload&gt;true&lt;/use_split_payload&gt;&lt;when_to_exec&gt;1&lt;/when_to_exec&gt;&lt;/sa_pattern_prepost_script&gt;&lt;sys_es_latest_script action="INSERT_OR_UPDATE"&gt;&lt;id&gt;7e98be65c37d3a10982a7d0ed40131cb&lt;/id&gt;&lt;sys_created_by&gt;karel.benes&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2025-12-13 22:12:16&lt;/sys_created_on&gt;&lt;sys_id&gt;a679fe65c37d3a10982a7d0ed401312e&lt;/sys_id&gt;&lt;sys_mod_count&gt;0&lt;/sys_mod_count&gt;&lt;sys_updated_by&gt;karel.benes&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2025-12-13 22:12:16&lt;/sys_updated_on&gt;&lt;table&gt;sa_pattern_prepost_script&lt;/table&gt;&lt;use_es_latest&gt;true&lt;/use_es_latest&gt;&lt;/sys_es_latest_script&gt;&lt;/record_update&gt;</payload>
+<payload_hash>519165540</payload_hash>
+<remote_update_set display_value="Create references between Proxmox and Linux (KVM)">7d1c7425c3aaba90982a7d0ed4013129</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-01-19 19:51:32</sys_created_on>
+<sys_id>b51c7425c3aaba90982a7d0ed401312a</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_recorded_at>19bd7cf44260000001</sys_recorded_at>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-01-19 19:51:32</sys_updated_on>
+<table/>
+<target_name>Create references between Proxmox and Linux (KVM)</target_name>
+<type>Pattern Pre/Post Script</type>
+<update_domain>global</update_domain>
+<update_guid>b1ebb8e1c1aaba90efd1095aa0128fd2</update_guid>
+<update_guid_history>b1ebb8e1c1aaba90efd1095aa0128fd2:519165540,0fdb78e146aaba90f957b39747e8e849:1515098752,042f12225dc6fa10d7c704e42760feb3:519165540,cc62350679793e108f4872878ca7ca67:-1913594426,c45c4cc6f3f9fa102c1add585db08f90:-295528045,1afa8046bef9fa10c422c0c4bf0275d4:-1719909719,3103c80e1b79fa10822d7eded073d647:-1755871611,7d30d2b593b9ba10713cf66d5f91ca7d:-1248013385,b679fae58d7d3a104f53a7c36fa1a6ae:-458055929</update_guid_history>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+</unload>
