@@ -12,7 +12,7 @@ Proxmox VMs config.xml => script to get config of VM instances; goes to MID Serv
 
 Proxmox CTs config.xml => script to get config of CT instances; goes to MID Server Script Files, parent SSHScriptFiles
 
-Get Object Id for QEMU Linux Server => pattern to pair discovered Windows Server with VM instance; add as an extension to OOB pattern Linux Server
+Get Object Id for QEMU Linux Server.xml => pattern to pair discovered Linux Server with VM instance; add as an extension to OOB pattern Linux Server
 
 Get Object Id for QEMU Windows Server.xml => pattern to pair discovered Windows Server with VM instance; add as an extension to OOB pattern Windows OS - Servers
 
