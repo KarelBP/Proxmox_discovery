@@ -24,6 +24,7 @@ TMPFILE="$(mktemp)"
   [ -x "$(type -P ls)" ]         && echo "    $(type -P ls), \\"
   [ -x "$(type -P lsof)" ]       && echo "    $(type -P lsof), \\"
   [ -x "$(type -P pvesh)" ]      && echo "    $(type -P pvesh) get *, \\"
+  [ -x "$(type -P pct)" ]        && echo "    $(type -P pct) pull *, \\"
 
 } >"$TMPFILE"
 
@@ -52,3 +53,5 @@ if getent group libvirt >/dev/null; then
 else
     echo "WARN: Group 'libvirt' does not exist — skipping group addition"
 fi
+
+

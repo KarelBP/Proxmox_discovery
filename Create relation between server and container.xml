@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2026-03-14 06:51:09">
+<sys_remote_update_set action="INSERT_OR_UPDATE">
+<application display_value="Global">global</application>
+<application_name>Global</application_name>
+<application_scope>global</application_scope>
+<application_version/>
+<collisions/>
+<commit_date/>
+<deleted/>
+<description/>
+<inserted/>
+<name>Create relation between server and container</name>
+<origin_sys_id/>
+<parent display_value=""/>
+<release_date/>
+<remote_base_update_set display_value=""/>
+<remote_parent_id/>
+<remote_sys_id>b4ce8036c3ef76d0982a7d0ed40131e2</remote_sys_id>
+<state>loaded</state>
+<summary/>
+<sys_class_name>sys_remote_update_set</sys_class_name>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-03-14 06:51:08</sys_created_on>
+<sys_id>a85f8836c3ef76d0982a7d0ed40131cd</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-03-14 06:51:08</sys_updated_on>
+<update_set display_value=""/>
+<update_source display_value=""/>
+<updated/>
+</sys_remote_update_set>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>sa_pattern_prepost_script_460455a2c32bfe90982a7d0ed40131bf</name>
+<payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update sys_domain="global" table="sa_pattern_prepost_script"&gt;&lt;sa_pattern_prepost_script action="INSERT_OR_UPDATE"&gt;&lt;active&gt;true&lt;/active&gt;&lt;execution_type&gt;1&lt;/execution_type&gt;&lt;name&gt;Create relation between server and container&lt;/name&gt;&lt;order&gt;200&lt;/order&gt;&lt;pattern&gt;1d2810b14fa12200609b92918110c7a7&lt;/pattern&gt;&lt;script&gt;&lt;![CDATA[/*
+ * Post sensor script
+ */
+
+var rtrn = {};
+
+var computerGlideRecord;
+
+var getDiscoveredServerGlideRecord = function() {
+    var traversedObject;
+
+    for (var itemIndex in payloadObj.items) {
+        traversedObject = payloadObj.items[itemIndex];
+
+        if (traversedObject.className == 'cmdb_ci_linux_server' || traversedObject.className == 'cmdb_ci_win_server') {
+            computerGlideRecord = getGlideRecordByAttribute(traversedObject.className, 'sys_id', traversedObject.sysId);
+            computerGlideRecord.next();
+            break;
+        }
+    }
+};
+
+var createRelationBetweenHostToContainer = function() {
+
+    var serialNumber = computerGlideRecord.getValue('serial_number');
+    if (!serialNumber)
+        return;
+
+    findAndCreateRelationToContainer(serialNumber, computerGlideRecord.getUniqueValue());
+};
+
+var findAndCreateRelationToContainer = function(serialNumber, ciSysId) {
+
+    var containerGlideRecord = new GlideRecord('cmdb_ci_oslv_container');
+    containerGlideRecord.addQuery('serial_number', serialNumber);
+    containerGlideRecord.query();
+
+    while (containerGlideRecord.next()) {
+
+        createRelation(
+            ciSysId,
+            containerGlideRecord.getUniqueValue(),
+            "d93304fb0a0a0b78006081a72ef08444"
+        );
+
+        break;
+    }
+
+    return containerGlideRecord;
+};
+
+var createRelation = function(parentSysId, childSysId, relationSysId) {
+
+    var relationGlideRecord = new GlideRecord("cmdb_rel_ci");
+
+    relationGlideRecord.addQuery("child", childSysId);
+    relationGlideRecord.addQuery("parent", parentSysId);
+    relationGlideRecord.addQuery("type", relationSysId);
+    relationGlideRecord.query();
+
+    if (!relationGlideRecord.next()) {
+        relationGlideRecord.setValue('child', childSysId);
+        relationGlideRecord.setValue('parent', parentSysId);
+        relationGlideRecord.setValue('type', relationSysId);
+        relationGlideRecord.insert();
+    }
+};
+
+var getGlideRecordByAttribute = function(table, attributeName, attributeValue) {
+
+    var glideRecord = new GlideRecord(table);
+    glideRecord.addQuery(attributeName, attributeValue);
+    glideRecord.query();
+
+    return glideRecord;
+};
+
+if (payloadRecords) {
+    while (payloadRecords.next()) {
+        var payloadObj = JSON.parse(payloadRecords.ie_output + '');
+        getDiscoveredServerGlideRecord();
+        createRelationBetweenHostToContainer();
+        payloadObj = null;
+    }
+}
+
+rtrn = {
+    'status': {
+        'message': 'Create relation from server to container finished successfully',
+        'isSuccess': true
+    },
+    'patternId': patternId
+};]]&gt;&lt;/script&gt;&lt;sys_class_name&gt;sa_pattern_prepost_script&lt;/sys_class_name&gt;&lt;sys_created_by&gt;karel.benes&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2026-03-13 17:14:10&lt;/sys_created_on&gt;&lt;sys_domain&gt;global&lt;/sys_domain&gt;&lt;sys_id&gt;460455a2c32bfe90982a7d0ed40131bf&lt;/sys_id&gt;&lt;sys_mod_count&gt;4&lt;/sys_mod_count&gt;&lt;sys_name&gt;Create relation between server and container&lt;/sys_name&gt;&lt;sys_overrides/&gt;&lt;sys_package display_value="Global" source="global"&gt;global&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_scope display_value="Global"&gt;global&lt;/sys_scope&gt;&lt;sys_update_name&gt;sa_pattern_prepost_script_460455a2c32bfe90982a7d0ed40131bf&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;karel.benes&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2026-03-14 06:49:24&lt;/sys_updated_on&gt;&lt;use_split_payload&gt;true&lt;/use_split_payload&gt;&lt;when_to_exec&gt;2&lt;/when_to_exec&gt;&lt;/sa_pattern_prepost_script&gt;&lt;sys_es_latest_script action="INSERT_OR_UPDATE"&gt;&lt;id&gt;460455a2c32bfe90982a7d0ed40131bf&lt;/id&gt;&lt;sys_created_by&gt;karel.benes&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2026-03-13 17:14:10&lt;/sys_created_on&gt;&lt;sys_id&gt;9154ddeec32bf2d0982a7d0ed4013171&lt;/sys_id&gt;&lt;sys_mod_count&gt;0&lt;/sys_mod_count&gt;&lt;sys_updated_by&gt;karel.benes&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2026-03-13 17:14:10&lt;/sys_updated_on&gt;&lt;table&gt;sa_pattern_prepost_script&lt;/table&gt;&lt;use_es_latest&gt;true&lt;/use_es_latest&gt;&lt;/sys_es_latest_script&gt;&lt;/record_update&gt;</payload>
+<payload_hash>2030171177</payload_hash>
+<remote_update_set display_value="Create relation between server and container">a85f8836c3ef76d0982a7d0ed40131cd</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>karel.benes</sys_created_by>
+<sys_created_on>2026-03-14 06:51:08</sys_created_on>
+<sys_id>ec5f8836c3ef76d0982a7d0ed40131cd</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_recorded_at>19ceb1b59d50000001</sys_recorded_at>
+<sys_updated_by>karel.benes</sys_updated_by>
+<sys_updated_on>2026-03-14 06:51:08</sys_updated_on>
+<table/>
+<target_name>Create relation between server and container</target_name>
+<type>Pattern Pre/Post Script</type>
+<update_domain>global</update_domain>
+<update_guid>8feecc366fef76d047ed4c5cb2899809</update_guid>
+<update_guid_history>8feecc366fef76d047ed4c5cb2899809:2030171177,5bdec8365eef76d051317a1d8ed8a2f5:-1104707637,d96e04f227ef76d0dc7bdadb72e1fc16:2030171177,626b95e6bfabf2d0c2b10e43231a6ed1:-1876633559,d554ddee862bf2d0d17d402d45d2dd7b:1535041406</update_guid_history>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+</unload>
