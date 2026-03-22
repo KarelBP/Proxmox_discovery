@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2026-03-14 06:42:58">
+<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2026-03-22 16:02:10">
 <sys_remote_update_set action="INSERT_OR_UPDATE">
 <application display_value="Global">global</application>
 <application_name>Global</application_name>
@@ -20,11 +20,11 @@
 <summary/>
 <sys_class_name>sys_remote_update_set</sys_class_name>
 <sys_created_by>karel.benes</sys_created_by>
-<sys_created_on>2026-03-14 06:42:58</sys_created_on>
-<sys_id>b07d8032c3ef76d0982a7d0ed401315d</sys_id>
+<sys_created_on>2026-03-22 16:02:09</sys_created_on>
+<sys_id>8e2a1359c3f37a54982a7d0ed40131f3</sys_id>
 <sys_mod_count>0</sys_mod_count>
 <sys_updated_by>karel.benes</sys_updated_by>
-<sys_updated_on>2026-03-14 06:42:58</sys_updated_on>
+<sys_updated_on>2026-03-22 16:02:09</sys_updated_on>
 <update_set display_value=""/>
 <update_source display_value=""/>
 <updated/>
@@ -37,67 +37,86 @@
 <name>ecc_agent_script_file_eedb5802c30a7610982a7d0ed4013102</name>
 <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="ecc_agent_script_file"><ecc_agent_script_file action="INSERT_OR_UPDATE"><active>true</active><checksum/><description>Get JSON with Proxmox LXC containers' config</description><directory>false</directory><name>Proxmox_CTs_config.sh</name><parent display_value="SSHScriptFiles">48deb961ff123100ab8fffffffffff07</parent><script>#!/bin/bash&#13;
 &#13;
-# 1. Get name of local node&#13;
-local_node=$(sudo pvesh get /cluster/status --output-format json \&#13;
-  | tr ',' '\n' \&#13;
-  | grep -A 3 '"local":1' \&#13;
-  | grep '"name"' \&#13;
-  | head -n1 \&#13;
-  | sed -E 's/.*"name":"([^"]+)".*/\1/')&#13;
+python3 - &lt;&lt;EOF&#13;
+import json&#13;
+import subprocess&#13;
+import tempfile&#13;
+import sys&#13;
+from pathlib import Path&#13;
 &#13;
-# 2. Get list of CTs from local node&#13;
-vmids=$(sudo pvesh get /nodes/"$local_node"/lxc/ --output-format json \&#13;
-  | tr ',' '\n' \&#13;
-  | grep '"vmid"' \&#13;
-  | sed -E 's/.*"vmid":([0-9]+).*/\1/')&#13;
 &#13;
-# 3. Get configs and create JSON array&#13;
-echo "["&#13;
+def run(cmd: list[str]) -&gt; str:&#13;
+    result = subprocess.run(cmd, capture_output=True, text=True)&#13;
+    if result.returncode != 0:&#13;
+        print(f"[warn] Command failed: {' '.join(cmd)}\n{result.stderr}", file=sys.stderr)&#13;
+    return result.stdout.strip()&#13;
 &#13;
-first=1&#13;
-for vmid in $vmids; do&#13;
 &#13;
-    tmpfile="/tmp/$vmid"&#13;
+def get_local_node() -&gt; str:&#13;
+    raw = run(["sudo", "pvesh", "get", "/cluster/status", "--output-format", "json"])&#13;
+    nodes = json.loads(raw)&#13;
+    for node in nodes:&#13;
+        if node.get("local") == 1:&#13;
+            return node["name"]&#13;
+    raise RuntimeError("Local node not found in cluster status.")&#13;
 &#13;
-    # pull machine-id from container&#13;
-    sudo pct pull "$vmid" /etc/machine-id "$tmpfile" &gt;/dev/null 2&gt;&amp;1&#13;
 &#13;
-    # read machine-id&#13;
-    machine_id=$(cat "$tmpfile" 2&gt;/dev/null | tr -d '\n')&#13;
+def get_vmids(node: str) -&gt; list[str]:&#13;
+    raw = run(["sudo", "pvesh", "get", f"/nodes/{node}/lxc/", "--output-format", "json"])&#13;
+    containers = json.loads(raw)&#13;
+    return [str(ct["vmid"]) for ct in containers]&#13;
 &#13;
-    # get container config&#13;
-    cfg=$(sudo pvesh get /nodes/"$local_node"/lxc/"$vmid"/config --output-format json)&#13;
 &#13;
-    # append machine_id into JSON&#13;
-    cfg=$(echo "$cfg" | sed "s/}$/,\"machine_id\":\"$machine_id\"}/")&#13;
+def get_machine_id(vmid: str) -&gt; str:&#13;
+    tmp_path = Path(f"/tmp/{vmid}.vmid")&#13;
+    subprocess.run(&#13;
+        ["sudo", "pct", "pull", vmid, "/etc/machine-id", str(tmp_path)],&#13;
+        capture_output=True,&#13;
+    )&#13;
+    try:&#13;
+        return Path(tmp_path).read_text().strip()&#13;
+    except FileNotFoundError:&#13;
+        return ""&#13;
 &#13;
-    if [ $first -eq 1 ]; then&#13;
-        first=0&#13;
-    else&#13;
-        echo ","&#13;
-    fi&#13;
 &#13;
-    echo "$cfg"&#13;
+def get_config(node: str, vmid: str) -&gt; dict:&#13;
+    raw = run(["sudo", "pvesh", "get", f"/nodes/{node}/lxc/{vmid}/config", "--output-format", "json"])&#13;
+    return json.loads(raw)&#13;
 &#13;
-done&#13;
 &#13;
-echo "]"</script><script_attachment/><source/><sys_class_name>ecc_agent_script_file</sys_class_name><sys_created_by>karel.benes</sys_created_by><sys_created_on>2025-12-27 10:16:30</sys_created_on><sys_domain>global</sys_domain><sys_domain_path>/</sys_domain_path><sys_id>eedb5802c30a7610982a7d0ed4013102</sys_id><sys_mod_count>9</sys_mod_count><sys_name>Proxmox_CTs_config.sh</sys_name><sys_overrides/><sys_package display_value="Global" source="global">global</sys_package><sys_policy/><sys_scope display_value="Global">global</sys_scope><sys_update_name>ecc_agent_script_file_eedb5802c30a7610982a7d0ed4013102</sys_update_name><sys_updated_by>karel.benes</sys_updated_by><sys_updated_on>2026-03-14 06:42:02</sys_updated_on><use_attachment>false</use_attachment><version/></ecc_agent_script_file></record_update>]]></payload>
-<payload_hash>1919806877</payload_hash>
-<remote_update_set display_value="Proxmox CTs config">b07d8032c3ef76d0982a7d0ed401315d</remote_update_set>
+def main():&#13;
+    node = get_local_node()&#13;
+    vmids = get_vmids(node)&#13;
+&#13;
+    inventory = []&#13;
+    for vmid in vmids:&#13;
+        cfg = get_config(node, vmid)&#13;
+        cfg["machine_id"] = get_machine_id(vmid)&#13;
+        inventory.append(cfg)&#13;
+&#13;
+    print(json.dumps(inventory, indent=2))&#13;
+&#13;
+&#13;
+if __name__ == "__main__":&#13;
+    main()&#13;
+EOF&#13;
+</script><script_attachment/><source/><sys_class_name>ecc_agent_script_file</sys_class_name><sys_created_by>karel.benes</sys_created_by><sys_created_on>2025-12-27 10:16:30</sys_created_on><sys_domain>global</sys_domain><sys_domain_path>/</sys_domain_path><sys_id>eedb5802c30a7610982a7d0ed4013102</sys_id><sys_mod_count>16</sys_mod_count><sys_name>Proxmox_CTs_config.sh</sys_name><sys_overrides/><sys_package display_value="Global" source="global">global</sys_package><sys_policy/><sys_scope display_value="Global">global</sys_scope><sys_update_name>ecc_agent_script_file_eedb5802c30a7610982a7d0ed4013102</sys_update_name><sys_updated_by>karel.benes</sys_updated_by><sys_updated_on>2026-03-22 15:59:24</sys_updated_on><use_attachment>false</use_attachment><version/></ecc_agent_script_file></record_update>]]></payload>
+<payload_hash>941407442</payload_hash>
+<remote_update_set display_value="Proxmox CTs config">8e2a1359c3f37a54982a7d0ed40131f3</remote_update_set>
 <replace_on_upgrade>false</replace_on_upgrade>
 <sys_created_by>karel.benes</sys_created_by>
-<sys_created_on>2026-03-14 06:42:58</sys_created_on>
-<sys_id>f47d8032c3ef76d0982a7d0ed401315d</sys_id>
+<sys_created_on>2026-03-22 16:02:09</sys_created_on>
+<sys_id>c22a1359c3f37a54982a7d0ed40131f4</sys_id>
 <sys_mod_count>0</sys_mod_count>
-<sys_recorded_at>19ceb149d830000001</sys_recorded_at>
+<sys_recorded_at>19d1645c6ad0000001</sys_recorded_at>
 <sys_updated_by>karel.benes</sys_updated_by>
-<sys_updated_on>2026-03-14 06:42:58</sys_updated_on>
+<sys_updated_on>2026-03-22 16:02:09</sys_updated_on>
 <table/>
 <target_name>Proxmox_CTs_config.sh</target_name>
 <type>MID Server Script File</type>
 <update_domain>global</update_domain>
-<update_guid>1f3d44fe4faf76d030b13538759296bd</update_guid>
-<update_guid_history>1f3d44fe4faf76d030b13538759296bd:1919806877,643dccbef3af76d0cc25df4ae88561aa:-1004536946,3ab6727c4aef7e50b2b2493b599b5a75:1919806877,f74336bc70af7e50b99eb2cf165c5747:1509665975,c463016d2deaba90745122e471fd2d9e:-1129571003,a2534d2d71eaba90d2232d626af0efdf:343469029,2c6a2296e6c27a1062e02bbda68c29a9:-1129571003,95b42aca5f0eb610330088ab2439dd71:641580269,8b8099822f42b610d0b9a556fb47104a:-755093146,c6eb508e880a76101d79f0ec7b500e64:2080285868</update_guid_history>
+<update_guid>3d89db9573f37a5403d7ebc354968f95</update_guid>
+<update_guid_history>3d89db9573f37a5403d7ebc354968f95:941407442,0d79179539f37a54f60e4edd643b37db:61437076,ae810fd58bbf3a5430cfae9993a773cb:941407442,4b00c751acbf3a54655b34d2bade5dc5:-1449979359,88ef7251acbf3a54f7d5d239fe661199:-1080360978,6fa51ebba1eb361442752aff4e22fa8a:-843173040,267592bbf1eb3614a3482430baaaa362:-1080360978,1f3d44fe4faf76d030b13538759296bd:1919806877,643dccbef3af76d0cc25df4ae88561aa:-1004536946,3ab6727c4aef7e50b2b2493b599b5a75:1919806877,f74336bc70af7e50b99eb2cf165c5747:1509665975,c463016d2deaba90745122e471fd2d9e:-1129571003,a2534d2d71eaba90d2232d626af0efdf:343469029,2c6a2296e6c27a1062e02bbda68c29a9:-1129571003,95b42aca5f0eb610330088ab2439dd71:641580269,8b8099822f42b610d0b9a556fb47104a:-755093146,c6eb508e880a76101d79f0ec7b500e64:2080285868</update_guid_history>
 <update_set display_value=""/>
 <view/>
 </sys_update_xml>

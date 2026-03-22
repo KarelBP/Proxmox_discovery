@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2026-01-19 20:19:09">
+<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2026-03-22 16:01:18">
 <sys_remote_update_set action="INSERT_OR_UPDATE">
 <application display_value="Global">global</application>
 <application_name>Global</application_name>
@@ -20,11 +20,11 @@
 <summary/>
 <sys_class_name>sys_remote_update_set</sys_class_name>
 <sys_created_by>karel.benes</sys_created_by>
-<sys_created_on>2026-01-19 20:19:08</sys_created_on>
-<sys_id>96624d69c3eaba90982a7d0ed401312b</sys_id>
+<sys_created_on>2026-03-22 16:01:17</sys_created_on>
+<sys_id>21f95719c3f37a54982a7d0ed40131e2</sys_id>
 <sys_mod_count>0</sys_mod_count>
 <sys_updated_by>karel.benes</sys_updated_by>
-<sys_updated_on>2026-01-19 20:19:08</sys_updated_on>
+<sys_updated_on>2026-03-22 16:01:17</sys_updated_on>
 <update_set display_value=""/>
 <update_source display_value=""/>
 <updated/>
@@ -37,68 +37,84 @@
 <name>ecc_agent_script_file_d9332607c3f97650982a7d0ed40131ed</name>
 <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="ecc_agent_script_file"><ecc_agent_script_file action="INSERT_OR_UPDATE"><active>true</active><checksum/><description>Get JSON with Proxmox QEMU VMs' config</description><directory>false</directory><name>Proxmox_VMs_config.sh</name><parent display_value="SSHScriptFiles">48deb961ff123100ab8fffffffffff07</parent><script>#!/bin/bash&#13;
 &#13;
-# 1. Get name of local node&#13;
-local_node=$(sudo pvesh get /cluster/status --output-format json \&#13;
-  | tr ',' '\n' \&#13;
-  | grep -A 3 '"local":1' \&#13;
-  | grep '"name"' \&#13;
-  | head -n1 \&#13;
-  | sed -E 's/.*"name":"([^"]+)".*/\1/')&#13;
+python3 - &lt;&lt;EOF&#13;
+import json&#13;
+import re&#13;
+import subprocess&#13;
+import sys&#13;
 &#13;
-# 2. Get list of VMs from local node&#13;
-vmids=$(sudo pvesh get /nodes/"$local_node"/qemu/ --output-format json \&#13;
-  | tr ',' '\n' \&#13;
-  | grep '"vmid"' \&#13;
-  | sed -E 's/.*"vmid":([0-9]+).*/\1/')&#13;
 &#13;
-# 3. Get configs and create JSON array&#13;
-echo "["&#13;
+def run(cmd: list[str]) -&gt; str:&#13;
+    result = subprocess.run(cmd, capture_output=True, text=True)&#13;
+    if result.returncode != 0:&#13;
+        print(f"[warn] Command failed: {' '.join(cmd)}\n{result.stderr}", file=sys.stderr)&#13;
+    return result.stdout.strip()&#13;
 &#13;
-first=1&#13;
-for vmid in $vmids; do&#13;
-    cfg=$(sudo pvesh get /nodes/"$local_node"/qemu/"$vmid"/config --output-format json)&#13;
 &#13;
-    # --- counts ---&#13;
-    disks=$(echo "$cfg" \&#13;
-      | tr ',' '\n' \&#13;
-      | grep -E '"(ide|scsi|virtio|sata)[0-9]+|efidisk0"' \&#13;
-      | wc -l)&#13;
+def get_local_node() -&gt; str:&#13;
+    raw = run(["sudo", "pvesh", "get", "/cluster/status", "--output-format", "json"])&#13;
+    for node in json.loads(raw):&#13;
+        if node.get("local") == 1:&#13;
+            return node["name"]&#13;
+    raise RuntimeError("Local node not found in cluster status.")&#13;
 &#13;
-    nics=$(echo "$cfg" \&#13;
-      | tr ',' '\n' \&#13;
-      | grep -E '"net[0-9]+"' \&#13;
-      | wc -l)&#13;
 &#13;
-    # inject counts before closing brace&#13;
-    cfg_with_counts=$(echo "$cfg" | sed -E "s/}$/,\"disks\":$disks,\"nics\":$nics}/")&#13;
+def get_vmids(node: str) -&gt; list[str]:&#13;
+    raw = run(["sudo", "pvesh", "get", f"/nodes/{node}/qemu/", "--output-format", "json"])&#13;
+    return [str(vm["vmid"]) for vm in json.loads(raw)]&#13;
 &#13;
-    if [ $first -eq 1 ]; then&#13;
-        first=0&#13;
-    else&#13;
-        echo ","&#13;
-    fi&#13;
 &#13;
-    echo "$cfg_with_counts"&#13;
-done&#13;
+def get_config(node: str, vmid: str) -&gt; dict:&#13;
+    raw = run(["sudo", "pvesh", "get", f"/nodes/{node}/qemu/{vmid}/config", "--output-format", "json"])&#13;
+    return json.loads(raw)&#13;
 &#13;
-echo "]"&#13;
-</script><script_attachment/><source/><sys_class_name>ecc_agent_script_file</sys_class_name><sys_created_by>karel.benes</sys_created_by><sys_created_on>2025-12-18 12:27:08</sys_created_on><sys_domain>global</sys_domain><sys_domain_path>/</sys_domain_path><sys_id>d9332607c3f97650982a7d0ed40131ed</sys_id><sys_mod_count>12</sys_mod_count><sys_name>Proxmox_VMs_config.sh</sys_name><sys_overrides/><sys_package display_value="Global" source="global">global</sys_package><sys_policy/><sys_scope display_value="Global">global</sys_scope><sys_update_name>ecc_agent_script_file_d9332607c3f97650982a7d0ed40131ed</sys_update_name><sys_updated_by>karel.benes</sys_updated_by><sys_updated_on>2026-01-19 20:18:25</sys_updated_on><use_attachment>false</use_attachment><version/></ecc_agent_script_file></record_update>]]></payload>
-<payload_hash>2099274133</payload_hash>
-<remote_update_set display_value="Proxmox VMs config">96624d69c3eaba90982a7d0ed401312b</remote_update_set>
+&#13;
+DISK_RE = re.compile(r"^(ide|scsi|virtio|sata)\d+$|^efidisk0$")&#13;
+NIC_RE  = re.compile(r"^net\d+$")&#13;
+&#13;
+&#13;
+def count_disks(cfg: dict) -&gt; int:&#13;
+    return sum(1 for k in cfg if DISK_RE.match(k))&#13;
+&#13;
+&#13;
+def count_nics(cfg: dict) -&gt; int:&#13;
+    return sum(1 for k in cfg if NIC_RE.match(k))&#13;
+&#13;
+&#13;
+def main():&#13;
+    node  = get_local_node()&#13;
+    vmids = get_vmids(node)&#13;
+&#13;
+    inventory = []&#13;
+    for vmid in vmids:&#13;
+        cfg = get_config(node, vmid)&#13;
+        cfg["disks"] = count_disks(cfg)&#13;
+        cfg["nics"]  = count_nics(cfg)&#13;
+        inventory.append(cfg)&#13;
+&#13;
+    print(json.dumps(inventory, indent=2))&#13;
+&#13;
+&#13;
+if __name__ == "__main__":&#13;
+    main()&#13;
+EOF&#13;
+</script><script_attachment/><source/><sys_class_name>ecc_agent_script_file</sys_class_name><sys_created_by>karel.benes</sys_created_by><sys_created_on>2025-12-18 12:27:08</sys_created_on><sys_domain>global</sys_domain><sys_domain_path>/</sys_domain_path><sys_id>d9332607c3f97650982a7d0ed40131ed</sys_id><sys_mod_count>19</sys_mod_count><sys_name>Proxmox_VMs_config.sh</sys_name><sys_overrides/><sys_package display_value="Global" source="global">global</sys_package><sys_policy/><sys_scope display_value="Global">global</sys_scope><sys_update_name>ecc_agent_script_file_d9332607c3f97650982a7d0ed40131ed</sys_update_name><sys_updated_by>karel.benes</sys_updated_by><sys_updated_on>2026-03-22 16:00:46</sys_updated_on><use_attachment>false</use_attachment><version/></ecc_agent_script_file></record_update>]]></payload>
+<payload_hash>172293044</payload_hash>
+<remote_update_set display_value="Proxmox VMs config">21f95719c3f37a54982a7d0ed40131e2</remote_update_set>
 <replace_on_upgrade>false</replace_on_upgrade>
 <sys_created_by>karel.benes</sys_created_by>
-<sys_created_on>2026-01-19 20:19:08</sys_created_on>
-<sys_id>da624d69c3eaba90982a7d0ed401312b</sys_id>
+<sys_created_on>2026-03-22 16:01:17</sys_created_on>
+<sys_id>65f95719c3f37a54982a7d0ed40131e2</sys_id>
 <sys_mod_count>0</sys_mod_count>
-<sys_recorded_at>19bd7e8a1820000001</sys_recorded_at>
+<sys_recorded_at>19d164704b20000001</sys_recorded_at>
 <sys_updated_by>karel.benes</sys_updated_by>
-<sys_updated_on>2026-01-19 20:19:08</sys_updated_on>
+<sys_updated_on>2026-03-22 16:01:17</sys_updated_on>
 <table/>
 <target_name>Proxmox_VMs_config.sh</target_name>
 <type>MID Server Script File</type>
 <update_domain>global</update_domain>
-<update_guid>3b32c1694beaba908ee3941ce846acd7</update_guid>
-<update_guid_history>3b32c1694beaba908ee3941ce846acd7:2099274133,0a32416999eaba909b60cf655b8aeff9:1380092251,3de4a20e590eb610c599853298f920b2:2099274133,2dc4eeca4e0eb610ad800a8c97cebecd:-803604421,8da617808682fe50ec573fa014d15b10:-1420618951,2dbac82bdcbd3a507afe4a2570ca7550:-1317202649,9db7402f8a7d3a50f0beb4de4f27437a:-425337737,ae72ba43b7bd7650036f3032f8d09213:-239720265,4722b64349bd76505db5afe50ce490e6:1949724177,4d6fa6cb177d76501761caa1f4d5841b:-1998472643,2f2daa87f27d76509c89e3af8255d5a5:1041632183,c6d56a87db3d76502f2cc3bae6be8c84:-687034263,cc83ae07e7f976506b81d6fc52d833ed:1851992675</update_guid_history>
+<update_guid>3dd91fd557f37a54561913cc841983f8</update_guid>
+<update_guid_history>3dd91fd557f37a54561913cc841983f8:172293044,9ec99bd58cf37a5410e080f55e39a787:-164715178,a491cfd520bf3a54e7fab70706fd429f:172293044,e660c7d146bf3a5454e57809ab61e3a8:-583676731,985003d18cbf3a54d986b2b10b55a241:360881124,21b552fbb5eb3614a79ac7aa7ded2c90:387877280,cb75d2bb3beb361452119a87888cd601:360881124,3b32c1694beaba908ee3941ce846acd7:2099274133,0a32416999eaba909b60cf655b8aeff9:1380092251,3de4a20e590eb610c599853298f920b2:2099274133,2dc4eeca4e0eb610ad800a8c97cebecd:-803604421,8da617808682fe50ec573fa014d15b10:-1420618951,2dbac82bdcbd3a507afe4a2570ca7550:-1317202649,9db7402f8a7d3a50f0beb4de4f27437a:-425337737,ae72ba43b7bd7650036f3032f8d09213:-239720265,4722b64349bd76505db5afe50ce490e6:1949724177,4d6fa6cb177d76501761caa1f4d5841b:-1998472643,2f2daa87f27d76509c89e3af8255d5a5:1041632183,c6d56a87db3d76502f2cc3bae6be8c84:-687034263,cc83ae07e7f976506b81d6fc52d833ed:1851992675</update_guid_history>
 <update_set display_value=""/>
 <view/>
 </sys_update_xml>
