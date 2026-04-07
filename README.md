@@ -34,3 +34,5 @@ Part 2 - [Know Your Enemy](https://www.linkedin.com/pulse/know-your-enemy-karel-
 Part 3 - [Keyboard. Video. Mouse.](https://www.linkedin.com/pulse/keyboard-video-mouse-karel-bene%C5%A1-moqnf/) - Discovering KVM
 
 Part 4 - [1600 Newton-meters at 6000 RPM](https://www.linkedin.com/pulse/1600-newton-meters-6000-rpm-karel-bene%C5%A1-es5vf/) - Discovering LXC
+
+Part 5 - [Hard Rock](https://www.linkedin.com/pulse/hard-rock-karel-bene%25C5%25A1-o7qef/) - Conclusion
