@@ -25,6 +25,10 @@ Create relation between server and container.xml => Pre/Post script to pair cmdb
 disco_linux.sh => script to give user 'disco' necessary sudo permissions
 
 
+## Important notice
+In case pattern debug shows green but CIs do not get created (namely KVM and OSLV engine), you may be missing the CI types in List of CI Types Related to Pattern. Open the pattern, click the slider icon at the top right of the CI Attributes panel, and add the missing CI types.
+
+
 
 ## Articles
 Part 1 - [Enterprise Ready](https://www.linkedin.com/pulse/enterprise-ready-karel-bene%C5%A1-8cgyf/) - Introduction
